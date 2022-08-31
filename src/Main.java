@@ -43,6 +43,9 @@ public class Main{
             System.out.println("7) Editar projeto");
             System.out.println("8) Editar Atividade");
             System.out.println("9) Editar Usuario");
+            System.out.println("10) Procurar por projeto");
+            System.out.println("11) Procurar por atividade");
+            System.out.println("12) Procurar por usuario");
             System.out.println("99) Sair");
 
             command = input.nextInt();
@@ -392,6 +395,36 @@ public class Main{
                         users.get(idx).type = newUserType;
                     }
                 }
+            }
+            else if (command == 10){
+                String projectName;
+
+                System.out.println("Que projeto?");
+
+                projectName = input.nextLine();
+
+                if (findProjectIndexByName(projects, projectName) != -1) System.out.println("Existe");
+                else System.out.println("Nao existe");
+            }
+            else if (command == 11){
+                String activityName;
+
+                System.out.println("Que atividade?");
+
+                activityName = input.nextLine();
+
+                if (findActivityIndexByName(activities, activityName) != -1) System.out.println("Existe");
+                else System.out.println("Nao existe");
+            }
+            else if (command == 10){
+                String userName;
+
+                System.out.println("Que usuario?");
+
+                userName = input.nextLine();
+
+                if (findUserIndexByName(users, userName) == -1) System.out.println("Existe");
+                else System.out.println("Nao existe");
             }
 
             else if (command == 96){
