@@ -18,4 +18,12 @@ public class Project {
         this.activities = new ArrayList<Activity>();
         this.salary = new ArrayList<Double>();
     }
+
+    public boolean isReadyToInitiate(){
+        return (!this.start.equals("none") && this.end.equals("none") && this.status.equals("Em processo de criacao"));
+    }
+
+    public void initiateProject(){
+        this.status = "Iniciado";
+    }
 }
