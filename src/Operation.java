@@ -74,7 +74,7 @@ class EditActivity extends ActivityOperation{
     public Activity activityBeforeEditing;
     public Activity editedActivity;
 
-    public EditActivity(Activity activityBeforeEditing, Activity editedActivity){
+    public EditActivity(Activity editedActivity, Activity activityBeforeEditing){
         this.activityBeforeEditing = activityBeforeEditing;
         this.editedActivity = editedActivity;
         this.operationType = 2;
@@ -114,7 +114,7 @@ class EditUser extends UserOperation{
     public User userBeforeEditing;
     public User editedUser;
 
-    public EditUser(User userBeforeEditing, User editedUser){
+    public EditUser(User editedUser, User userBeforeEditing){
         this.userBeforeEditing = userBeforeEditing;
         this.editedUser = editedUser;
         this.operationType = 3;

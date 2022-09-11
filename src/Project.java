@@ -7,8 +7,9 @@ public class Project {
     public ArrayList<Activity> activities;
     public ArrayList<Double> salary;
     public ArrayList<User> borrowedUsers;
+    public int paymentPeriod;
 
-    public Project(String id, String description, String start, String end, User coordinator){
+    public Project(String id, String description, String start, String end, User coordinator, int paymentPeriod){
         this.id = id;
         this.description = description;
         this.start = start;
@@ -19,6 +20,7 @@ public class Project {
         this.activities = new ArrayList<Activity>();
         this.salary = new ArrayList<Double>();
         this.borrowedUsers = new ArrayList<User>();
+        this.paymentPeriod = paymentPeriod;
     }
 
     public boolean isReadyToInitiate(){
@@ -48,17 +50,23 @@ public class Project {
         this.end = project.end;
         this.status = project.status;
         this.coordinator = project.coordinator;
+        this.paymentPeriod = project.paymentPeriod;
+
+        this.activities.clear();
         for (Activity activity : project.activities) {
             this.activities.add(activity);
         }
+        this.peopleOnProject.clear();
         for (User user : project.peopleOnProject) {
             this.peopleOnProject.add(user);
         }
+        this.salary.clear();
         for (Double salary : project.salary) {
             this.salary.add(salary);
         }
-        for (User users : project.borrowedUsers) {
-            this.borrowedUsers.add(users);
+        this.borrowedUsers.clear();
+        for (User user : project.borrowedUsers) {
+            this.borrowedUsers.add(user);
         }
     }
 }

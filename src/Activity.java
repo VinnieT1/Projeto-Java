@@ -17,4 +17,23 @@ public class Activity {
         this.whoIsDoing = new ArrayList<User>();
         this.ownerProject = ownerProject;
     }
+
+    public void copyActivityInfoFrom(Activity activity){
+        this.id = activity.id;
+        this.description = activity.description;
+        this.start = activity.start;
+        this.end = activity.end;
+        this.leader = activity.leader;
+        this.ownerProject = activity.ownerProject;
+
+        this.duties.clear();
+        for (String duty : activity.duties) {
+            this.duties.add(duty);
+        }
+
+        this.whoIsDoing.clear();
+        for (User user : activity.whoIsDoing) {
+            this.whoIsDoing.add(user);
+        }
+    }
 }
