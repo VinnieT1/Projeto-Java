@@ -38,8 +38,8 @@ public class Main{
     }
 
     // NOTE TO SELF:
-    // Ultima coisa que falta implementar: UNDO e REDO.
-    // IMPLEMENTAR A LOGICA DO UNDO E DO REDO.
+    // Ultima coisa que falta implementar: REDO.
+    // IMPLEMENTAR A LOGICA DO REDO.
     public static void main(String[] args){
         Scanner input = new Scanner(System.in);
         ArrayList<Project> projects = new ArrayList<Project>();
@@ -257,7 +257,7 @@ public class Main{
                     accountLoggedIn.accountOwner.projectsthatUserIsCoordinator.add(newProject);
                     projects.add(newProject);
 
-                    CreateProject createdProjectOperation = new CreateProject(newProject);
+                    Operation createdProjectOperation = new Operation(1, newProject);
                     done.push(createdProjectOperation);
                 }
                 else if (command == 2 && accountLoggedIn.accountOwner.canBeCoordinator){
@@ -287,12 +287,15 @@ public class Main{
                     for (User user : projectToRemove.borrowedUsers){
                         user.projectsThatUserWasLentTo.remove(projectToRemove);
                     }
+                    for (Activity activity : projectToRemove.activities) {
+                        activities.remove(activity);
+                    }
                     accountLoggedIn.accountOwner.projectsthatUserIsCoordinator.remove(projectToRemove);
 
                     projects.remove(projectToRemove);
                     System.out.println("Projeto " + projectName + " removido");
 
-                    RemoveProject removedProjectOperation = new RemoveProject(projectToRemove);
+                    Operation removedProjectOperation = new Operation(2, projectToRemove);
                     done.push(removedProjectOperation);
                 }
                 else if (command == 3 && accountLoggedIn.accountOwner.canBeCoordinator){
@@ -507,7 +510,7 @@ public class Main{
                     }
                     else if (command == 99) continue;
                 
-                    EditProject editedProjectOperation = new EditProject(project, projectBeforeEditing);
+                    Operation editedProjectOperation = new Operation(project, projectBeforeEditing);
                     done.push(editedProjectOperation);
                 }
                 else if (command == 4 && accountLoggedIn.accountOwner.canBeCoordinator){
@@ -549,7 +552,7 @@ public class Main{
                     targetProject.borrowedUsers.add(user);
                     user.projectsThatUserWasLentTo.add(targetProject);
 
-                    EditProject editedProjectOperation = new EditProject(targetProject, targetProjectBeforeEditing);
+                    Operation editedProjectOperation = new Operation(targetProject, targetProjectBeforeEditing);
                     done.push(editedProjectOperation);
                 }
                 else if (command == (accountLoggedIn.accountOwner.canBeCoordinator ? 5 : 1)){
@@ -659,7 +662,7 @@ public class Main{
                     leader.activitiesThatUserIsLeader.add(newActivity);
                     project.activities.add(newActivity);
 
-                    CreateActivity createActivityOperation = new CreateActivity(newActivity);
+                    Operation createActivityOperation = new Operation(1, newActivity);
                     done.push(createActivityOperation);
                 }
                 else if (command == 2 && accountLoggedIn.accountOwner.canBeCoordinator){
@@ -692,7 +695,7 @@ public class Main{
                     activityToRemove.leader.activitiesThatUserIsLeader.remove(activityToRemove);
                     activityToRemove.ownerProject.activities.remove(activityToRemove);
 
-                    RemoveActivity removedActivityOperation = new RemoveActivity(activityToRemove);
+                    Operation removedActivityOperation = new Operation(2, activityToRemove);
                     done.push(removedActivityOperation);
 
                     activities.remove(activityToRemove);
@@ -845,7 +848,7 @@ public class Main{
                     }
                     else if (command == 99) continue;
                 
-                    EditActivity editActivityOperation = new EditActivity(activity, activityBeforeEditing);
+                    Operation editActivityOperation = new Operation(activity, activityBeforeEditing);
                     done.push(editActivityOperation);
                 }
                 else if (command == (accountLoggedIn.accountOwner.canBeCoordinator ? 4 : 1)){
@@ -908,7 +911,7 @@ public class Main{
 
                     users.add(newUser);
 
-                    CreateUser createUserOperation = new CreateUser(newUser);
+                    Operation createUserOperation = new Operation(1, newUser);
                     done.push(createUserOperation);
                 }
                 else if (command == 2 && accountLoggedIn.accountOwner.canBeCoordinator){
@@ -943,7 +946,7 @@ public class Main{
                         activity.whoIsDoing.remove(userToRemove);
                     }
 
-                    RemoveUser removeUserOperation = new RemoveUser(userToRemove);
+                    Operation removeUserOperation = new Operation(2, userToRemove);
                     done.push(removeUserOperation);
 
                     users.remove(userToRemove);
@@ -1059,7 +1062,7 @@ public class Main{
                     else if (command == 99) continue;
                     else continue;
                 
-                    EditUser editUserOperation = new EditUser(user, userBeforeEditing);
+                    Operation editUserOperation = new Operation(user, userBeforeEditing);
                     done.push(editUserOperation);
                 }
                 else if (command == (accountLoggedIn.accountOwner.canBeCoordinator ? 4 : 1)){
@@ -1096,7 +1099,133 @@ public class Main{
                 }
             }
             else if (command == 96){
+                Operation poppedOperation;
 
+                if (done.size() == 0){
+                    System.out.println("Nao ha nenhuma operacao a ser desfeita");
+                    continue;
+                }
+                poppedOperation = done.pop();
+
+                if (poppedOperation.operationType == 1){
+                    if (poppedOperation.secondaryOperationType == 1){
+                        Project project = poppedOperation.createdProject;
+
+                        project.coordinator.projectsthatUserIsCoordinator.remove(project);
+                        projects.remove(project);
+                    }
+                    else if (poppedOperation.secondaryOperationType == 2){
+                        Project project = poppedOperation.removedProject;
+
+                        for (User user : project.borrowedUsers) {
+                            user.projectsThatUserWasLentTo.add(project);
+                        }
+                        for (User user : project.peopleOnProject){
+                            user.projectsWorkedOn.add(project);
+                        }
+                        for (Activity activity : project.activities) {
+                            activities.add(activity);
+                        }
+                        project.coordinator.projectsthatUserIsCoordinator.add(project);
+                    }
+                    else if (poppedOperation.secondaryOperationType == 3){
+                        Project editedProject = poppedOperation.editedProject;
+                        Project projectBeforeEditing = poppedOperation.projectBeforeEditing;
+
+                        for (User user : editedProject.borrowedUsers) {
+                            user.projectsThatUserWasLentTo.remove(editedProject);
+                            editedProject.borrowedUsers.remove(user);
+                        }
+                        for (User user : editedProject.peopleOnProject) {
+                            user.projectsWorkedOn.remove(editedProject);
+                            editedProject.peopleOnProject.remove(user);
+                        }
+
+                        editedProject.copyProjectInfoFrom(projectBeforeEditing);
+
+                        for (User user : editedProject.peopleOnProject) {
+                            user.projectsWorkedOn.add(editedProject);
+                        }
+                        for (User user : editedProject.borrowedUsers) {
+                            user.projectsThatUserWasLentTo.add(editedProject);
+                        }
+                    }
+                }
+                else if (poppedOperation.operationType == 2){
+                    if (poppedOperation.secondaryOperationType == 1){
+                        Activity activity = poppedOperation.createdActivity;
+
+                        activity.leader.activitiesThatUserIsLeader.remove(activity);
+                        activity.ownerProject.activities.remove(activity);
+
+                        activities.remove(activity);
+                    }
+                    else if (poppedOperation.secondaryOperationType == 2){
+                        Activity activity = poppedOperation.removedActivity;
+
+                        for (User user : activity.whoIsDoing) {
+                            user.activitiesWorkedOn.add(activity);
+                        }
+                        activity.leader.activitiesThatUserIsLeader.add(activity);
+                        activity.ownerProject.activities.add(activity);
+                    }
+                    else if (poppedOperation.secondaryOperationType == 3){
+                        Activity editedActivity = poppedOperation.editedActivity;
+                        Activity activityBeforeEditing = poppedOperation.activityBeforeEditing;
+
+                        for (User user : editedActivity.whoIsDoing) {
+                            user.activitiesWorkedOn.remove(editedActivity);
+                            editedActivity.whoIsDoing.remove(user);
+                        }
+                        editedActivity.copyActivityInfoFrom(activityBeforeEditing);
+                        for (User user : editedActivity.whoIsDoing) {
+                            user.activitiesWorkedOn.add(editedActivity);
+                        }
+                    }
+                }
+                else if (poppedOperation.operationType == 3){
+                    if (poppedOperation.secondaryOperationType == 1){
+                        User user = poppedOperation.createdUser;
+
+                        users.remove(user);
+                    }
+                    else if (poppedOperation.secondaryOperationType == 2){
+                        User user = poppedOperation.removedUser;
+
+                        for (Project project : user.projectsThatUserWasLentTo) {
+                            project.borrowedUsers.add(user);
+                        }
+                        for (Project project : user.projectsWorkedOn) {
+                            project.peopleOnProject.add(user);
+                        }
+                        for (Project project : user.projectsthatUserIsCoordinator) {
+                            project.coordinator = user;
+                        }
+                        for (Activity activity : user.activitiesThatUserIsLeader) {
+                            activity.leader = user;
+                        }
+                        for (Activity activity : user.activitiesWorkedOn) {
+                            activity.whoIsDoing.add(user);
+                        }
+
+                        users.add(user);
+                    }
+                    else if (poppedOperation.secondaryOperationType == 3){
+                        User userBeforeEditing = poppedOperation.userBeforeEditing;
+                        User editedUser = poppedOperation.editedUser;
+
+                        for (Activity activity : editedUser.activitiesWorkedOn) {
+                            activity.whoIsDoing.remove(editedUser);
+                        }
+                        editedUser.copyUserInfoFrom(userBeforeEditing);
+
+                        for (Activity activity : editedUser.activitiesWorkedOn) {
+                            activity.whoIsDoing.add(editedUser);
+                        }
+                    }
+                }
+
+                undone.push(poppedOperation);
             }
             else if (command == 97){
 
