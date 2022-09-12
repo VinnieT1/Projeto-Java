@@ -37,9 +37,6 @@ public class Main{
         return NOT_FOUND;
     }
 
-    // NOTE TO SELF:
-    // Ultima coisa que falta implementar: REDO.
-    // IMPLEMENTAR A LOGICA DO REDO.
     public static void main(String[] args){
         Scanner input = new Scanner(System.in);
         ArrayList<Project> projects = new ArrayList<Project>();
@@ -259,6 +256,7 @@ public class Main{
 
                     Operation createdProjectOperation = new Operation(1, newProject);
                     done.push(createdProjectOperation);
+                    undone.clear();
                 }
                 else if (command == 2 && accountLoggedIn.accountOwner.canBeCoordinator){
                     String projectName;
@@ -297,6 +295,7 @@ public class Main{
 
                     Operation removedProjectOperation = new Operation(2, projectToRemove);
                     done.push(removedProjectOperation);
+                    undone.clear();
                 }
                 else if (command == 3 && accountLoggedIn.accountOwner.canBeCoordinator){
                     String projectName;
@@ -512,6 +511,7 @@ public class Main{
                 
                     Operation editedProjectOperation = new Operation(project, projectBeforeEditing);
                     done.push(editedProjectOperation);
+                    undone.clear();
                 }
                 else if (command == 4 && accountLoggedIn.accountOwner.canBeCoordinator){
                     String projectName, userName, targetProjectName;
@@ -554,6 +554,7 @@ public class Main{
 
                     Operation editedProjectOperation = new Operation(targetProject, targetProjectBeforeEditing);
                     done.push(editedProjectOperation);
+                    undone.clear();
                 }
                 else if (command == (accountLoggedIn.accountOwner.canBeCoordinator ? 5 : 1)){
                     String projectName;
@@ -582,7 +583,7 @@ public class Main{
                         for (Activity activity : project.activities) {
                             System.out.print("    " + activity.id);
                         }
-                        System.out.println("Coordenador do projeto: " + project.coordinator.name + ", " + project.coordinator.type);
+                        System.out.println("Coordenador do projeto: " + project.coordinator != null ? (project.coordinator.name  + ", " + project.coordinator.type) : "Nenhum");
                         System.out.println("Usuarios no projeto: ");
                         for (User user : project.peopleOnProject) {
                             System.out.println("    " + user.name + ", " + user.type);
@@ -664,6 +665,7 @@ public class Main{
 
                     Operation createActivityOperation = new Operation(1, newActivity);
                     done.push(createActivityOperation);
+                    undone.clear();
                 }
                 else if (command == 2 && accountLoggedIn.accountOwner.canBeCoordinator){
                     String activityName, projectName;
@@ -697,6 +699,7 @@ public class Main{
 
                     Operation removedActivityOperation = new Operation(2, activityToRemove);
                     done.push(removedActivityOperation);
+                    undone.clear();
 
                     activities.remove(activityToRemove);
                     System.out.println("Atividade '" + activityName + "' removida");
@@ -850,6 +853,7 @@ public class Main{
                 
                     Operation editActivityOperation = new Operation(activity, activityBeforeEditing);
                     done.push(editActivityOperation);
+                    undone.clear();
                 }
                 else if (command == (accountLoggedIn.accountOwner.canBeCoordinator ? 4 : 1)){
                     String activityName;
@@ -873,7 +877,7 @@ public class Main{
                         System.out.println("Descricao: " + activity.description);
                         System.out.println("Inicio: " + activity.start);
                         System.out.println("Fim: " + activity.end);
-                        System.out.println("Responsavel: " + activity.leader.name + ", " + activity.leader.type);
+                        System.out.println("Responsavel: " + activity.leader != null ? (activity.leader.name + ", " + activity.leader.type) : "Nenhum");
                         System.out.println("Tarefas:");
                         for (String tarefa : activity.duties) {
                             System.out.println("    " + tarefa);
@@ -913,6 +917,7 @@ public class Main{
 
                     Operation createUserOperation = new Operation(1, newUser);
                     done.push(createUserOperation);
+                    undone.clear();
                 }
                 else if (command == 2 && accountLoggedIn.accountOwner.canBeCoordinator){
                     String userName;
@@ -948,6 +953,7 @@ public class Main{
 
                     Operation removeUserOperation = new Operation(2, userToRemove);
                     done.push(removeUserOperation);
+                    undone.clear();
 
                     users.remove(userToRemove);
                     System.out.println("Usuario '" + userName + "' removido");
@@ -1064,6 +1070,7 @@ public class Main{
                 
                     Operation editUserOperation = new Operation(user, userBeforeEditing);
                     done.push(editUserOperation);
+                    undone.clear();
                 }
                 else if (command == (accountLoggedIn.accountOwner.canBeCoordinator ? 4 : 1)){
                     String userName;
@@ -1071,8 +1078,9 @@ public class Main{
                     System.out.println("Que usuario?");
     
                     userName = input.nextLine();
+                    System.out.println(userName+".");
     
-                    if (findUserIndexByName(users, userName) == NOT_FOUND) System.out.println("Existe");
+                    if (findUserIndexByName(users, userName) != NOT_FOUND) System.out.println("Existe");
                     else System.out.println("Nao existe");
                 }
                 else if (command == (accountLoggedIn.accountOwner.canBeCoordinator ? 5 : 2)){
@@ -1131,6 +1139,8 @@ public class Main{
                     else if (poppedOperation.secondaryOperationType == 3){
                         Project editedProject = poppedOperation.editedProject;
                         Project projectBeforeEditing = poppedOperation.projectBeforeEditing;
+                        Project editedProjectAux = new Project(editedProject.id, editedProject.description, editedProject.start, editedProject.end, editedProject.coordinator, editedProject.paymentPeriod);
+                        editedProjectAux.copyProjectInfoFrom(editedProject);
 
                         for (User user : editedProject.borrowedUsers) {
                             user.projectsThatUserWasLentTo.remove(editedProject);
@@ -1141,6 +1151,10 @@ public class Main{
                             editedProject.peopleOnProject.remove(user);
                         }
 
+                        for (Double salary : editedProject.salary) {
+                            editedProject.salary.remove(salary);
+                        }
+
                         editedProject.copyProjectInfoFrom(projectBeforeEditing);
 
                         for (User user : editedProject.peopleOnProject) {
@@ -1149,6 +1163,8 @@ public class Main{
                         for (User user : editedProject.borrowedUsers) {
                             user.projectsThatUserWasLentTo.add(editedProject);
                         }
+
+                        poppedOperation.projectBeforeEditing = editedProjectAux;
                     }
                 }
                 else if (poppedOperation.operationType == 2){
@@ -1172,6 +1188,8 @@ public class Main{
                     else if (poppedOperation.secondaryOperationType == 3){
                         Activity editedActivity = poppedOperation.editedActivity;
                         Activity activityBeforeEditing = poppedOperation.activityBeforeEditing;
+                        Activity editedActivityAux = new Activity(editedActivity.id, editedActivity.description, editedActivity.start, editedActivity.end, editedActivity.leader, editedActivity.ownerProject);
+                        editedActivity.copyActivityInfoFrom(editedActivity);
 
                         for (User user : editedActivity.whoIsDoing) {
                             user.activitiesWorkedOn.remove(editedActivity);
@@ -1181,6 +1199,8 @@ public class Main{
                         for (User user : editedActivity.whoIsDoing) {
                             user.activitiesWorkedOn.add(editedActivity);
                         }
+
+                        poppedOperation.activityBeforeEditing = editedActivityAux;
                     }
                 }
                 else if (poppedOperation.operationType == 3){
@@ -1213,22 +1233,181 @@ public class Main{
                     else if (poppedOperation.secondaryOperationType == 3){
                         User userBeforeEditing = poppedOperation.userBeforeEditing;
                         User editedUser = poppedOperation.editedUser;
+                        User editedUserAux = new User(editedUser.name, editedUser.type);
+                        editedUserAux.copyUserInfoFrom(editedUser);
 
                         for (Activity activity : editedUser.activitiesWorkedOn) {
                             activity.whoIsDoing.remove(editedUser);
+                        }
+                        for (Activity activity : editedUser.activitiesThatUserIsLeader) {
+                            activity.leader = null;
                         }
                         editedUser.copyUserInfoFrom(userBeforeEditing);
 
                         for (Activity activity : editedUser.activitiesWorkedOn) {
                             activity.whoIsDoing.add(editedUser);
                         }
+                        for (Activity activity : editedUser.activitiesThatUserIsLeader) {
+                            activity.leader = editedUser;
+                        }
+
+                        poppedOperation.userBeforeEditing = editedUserAux;
                     }
                 }
 
                 undone.push(poppedOperation);
             }
             else if (command == 97){
+                Operation poppedOperation;
 
+                if (undone.size() == 0){
+                    System.out.println("Nao ha nenhuma operacao a ser feita");
+                    continue;
+                }
+                poppedOperation = undone.pop();
+
+                if (poppedOperation.operationType == 1){
+                    if (poppedOperation.secondaryOperationType == 1){
+                        Project hasToBeRecreated = poppedOperation.createdProject;
+
+                        hasToBeRecreated.coordinator.projectsthatUserIsCoordinator.add(hasToBeRecreated);
+                        projects.add(hasToBeRecreated);
+                    }
+                    else if (poppedOperation.secondaryOperationType == 2){
+                        Project hasToBeRemoved = poppedOperation.removedProject;
+
+                        for (User user : hasToBeRemoved.borrowedUsers) {
+                            user.projectsThatUserWasLentTo.remove(hasToBeRemoved);
+                        }
+                        for (User user : hasToBeRemoved.peopleOnProject) {
+                            user.projectsWorkedOn.remove(hasToBeRemoved);
+                        }
+                        for (Activity activity : hasToBeRemoved.activities) {
+                            activities.remove(activity);
+                        }
+                        hasToBeRemoved.coordinator.projectsthatUserIsCoordinator.remove(hasToBeRemoved);
+
+                    }
+                    else if (poppedOperation.secondaryOperationType == 3){
+                        Project hasToBeEdited = poppedOperation.editedProject;
+                        Project alreadyEdited = poppedOperation.projectBeforeEditing;
+                        Project hasToBeEditedAux = new Project(hasToBeEdited.id, hasToBeEdited.description, hasToBeEdited.start, hasToBeEdited.end, hasToBeEdited.coordinator, hasToBeEdited.paymentPeriod);
+                        hasToBeEditedAux.copyProjectInfoFrom(hasToBeEdited);
+
+                        for (User user : hasToBeEdited.borrowedUsers) {
+                            user.projectsThatUserWasLentTo.remove(hasToBeEdited);
+                            hasToBeEdited.borrowedUsers.remove(user);
+                        }
+                        for (User user : hasToBeEdited.peopleOnProject) {
+                            user.projectsWorkedOn.remove(hasToBeEdited);
+                            hasToBeEdited.peopleOnProject.remove(user);
+                        }
+
+                        for (Double salary : hasToBeEdited.salary) {
+                            hasToBeEdited.salary.remove(salary);
+                        }
+
+                        hasToBeEdited.copyProjectInfoFrom(alreadyEdited);
+
+                        for (User user : hasToBeEdited.peopleOnProject) {
+                            user.projectsWorkedOn.add(hasToBeEdited);
+                        }
+                        for (User user : hasToBeEdited.borrowedUsers) {
+                            user.projectsWorkedOn.add(hasToBeEdited);
+                        }
+
+                        poppedOperation.projectBeforeEditing = hasToBeEditedAux;
+                    }
+                }
+                else if (poppedOperation.operationType == 2){
+                    if (poppedOperation.secondaryOperationType == 1){
+                        Activity hasToBeCreated = poppedOperation.createdActivity;
+
+                        hasToBeCreated.leader.activitiesThatUserIsLeader.add(hasToBeCreated);
+                        hasToBeCreated.ownerProject.activities.add(hasToBeCreated);
+
+                        activities.add(hasToBeCreated);
+                    }
+                    else if (poppedOperation.secondaryOperationType == 2){
+                        Activity hasToBeRemoved = poppedOperation.removedActivity;
+
+                        for (User user : hasToBeRemoved.whoIsDoing) {
+                            user.activitiesWorkedOn.remove(hasToBeRemoved);
+                        }
+
+                        hasToBeRemoved.leader.activitiesThatUserIsLeader.remove(hasToBeRemoved);
+                        hasToBeRemoved.ownerProject.activities.remove(hasToBeRemoved);
+                    }
+                    else if (poppedOperation.secondaryOperationType == 3){
+                        Activity hasToBeEdited = poppedOperation.editedActivity;
+                        Activity alreadyEdited = poppedOperation.activityBeforeEditing;
+                        Activity hasToBeEditedAux = new Activity(hasToBeEdited.id, hasToBeEdited.description, hasToBeEdited.start, hasToBeEdited.end, hasToBeEdited.leader, hasToBeEdited.ownerProject);
+                        hasToBeEditedAux.copyActivityInfoFrom(hasToBeEdited);
+
+                        for (User user : hasToBeEdited.whoIsDoing) {
+                            user.activitiesWorkedOn.remove(hasToBeEdited);
+                            hasToBeEdited.whoIsDoing.remove(user);
+                        }
+                        hasToBeEdited.copyActivityInfoFrom(alreadyEdited);
+                        for (User user : hasToBeEdited.whoIsDoing) {
+                            user.activitiesWorkedOn.add(hasToBeEdited);
+                        }
+
+                        poppedOperation.activityBeforeEditing = hasToBeEditedAux;
+                    }
+                }
+                else if (poppedOperation.operationType == 3){
+                    if (poppedOperation.secondaryOperationType == 1){
+                        User hasToBeCreated = poppedOperation.createdUser;
+
+                        users.add(hasToBeCreated);
+                    }
+                    else if (poppedOperation.secondaryOperationType == 2){
+                        User hasToBeRemoved = poppedOperation.removedUser;
+
+                        for (Project project : hasToBeRemoved.projectsThatUserWasLentTo) {
+                            project.borrowedUsers.remove(hasToBeRemoved);
+                        }
+                        for (Project project : hasToBeRemoved.projectsWorkedOn) {
+                            project.peopleOnProject.remove(hasToBeRemoved);
+                        }
+                        for (Project project : hasToBeRemoved.projectsthatUserIsCoordinator) {
+                            project.coordinator = null;
+                        }
+                        for (Activity activity : hasToBeRemoved.activitiesThatUserIsLeader) {
+                            activity.leader = null;
+                        }
+                        for (Activity activity : hasToBeRemoved.activitiesWorkedOn) {
+                            activity.whoIsDoing.remove(hasToBeRemoved);
+                        }
+
+                        users.remove(hasToBeRemoved);
+                    }
+                    else if (poppedOperation.secondaryOperationType == 3){
+                        User hasToBeEdited = poppedOperation.editedUser;
+                        User alreadyEdited = poppedOperation.userBeforeEditing;
+                        User hasToBeEditedAux = new User(hasToBeEdited.name, hasToBeEdited.type);
+                        hasToBeEditedAux.copyUserInfoFrom(hasToBeEdited);
+
+                        for (Activity activity : hasToBeEdited.activitiesWorkedOn) {
+                            activity.whoIsDoing.remove(hasToBeEdited);
+                        }
+                        for (Activity activity : hasToBeEdited.activitiesThatUserIsLeader) {
+                            activity.leader = null;
+                        }
+                        hasToBeEdited.copyUserInfoFrom(alreadyEdited);
+                        for (Activity activity : hasToBeEdited.activitiesWorkedOn) {
+                            activity.whoIsDoing.add(hasToBeEdited);
+                        }
+                        for (Activity activity : hasToBeEdited.activitiesThatUserIsLeader) {
+                            activity.leader = hasToBeEdited;
+                        }
+
+                        poppedOperation.userBeforeEditing = hasToBeEditedAux;
+                    }
+                }
+            
+                done.push(poppedOperation);
             }
             else if (command == 98){
                 isLoggedIn = false;
