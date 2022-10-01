@@ -37,17 +37,24 @@ public class Coordinator extends User{
         );
     }
 
-    // TODO
     @Override
     public String displayActivityMenu(){
-        
+        return (
+            super.displayActivityMenu() +
+            "4) Criar Atividade" +
+            "5) Remover Atividade" +
+            "6) Editar Atividade"
+        );
     }
 
-    // TODO
     @Override
     public String displayUserMenu(){
-        super.displayUserMenu();
-        // TODO
+        return (
+            super.displayUserMenu() +
+            "4) Criar Usuario" +
+            "5) Remover Usuario" +
+            "6) Editar Usuario"
+        );
     }
 
 }

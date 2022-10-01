@@ -27,6 +27,37 @@ public class Project {
         this.paymentPeriod = paymentPeriod;
 	}
 
+	public Project(){
+
+	}
+
+	public void copyProjectInfoFrom(Project project){
+        this.id = project.id;
+        this.description = project.description;
+        this.start = project.start;
+        this.end = project.end;
+        this.status = project.status;
+        this.coordinator = project.coordinator;
+        this.paymentPeriod = project.paymentPeriod;
+
+        this.activities.clear();
+        for (Activity activity : project.activities) {
+            this.activities.add(activity);
+        }
+        this.peopleOnProject.clear();
+        for (Student student : project.peopleOnProject) {
+            this.peopleOnProject.add(student);
+        }
+        this.salary.clear();
+        for (Double salary : project.salary) {
+            this.salary.add(salary);
+        }
+        this.borrowedUsers.clear();
+        for (Student student : project.borrowedUsers) {
+            this.borrowedUsers.add(student);
+        }
+    }
+
 	public String getId() {
 		return this.id;
 	}
@@ -118,9 +149,9 @@ public class Project {
 	@Override
 	public String toString(){
 		return (	
-			"Titulo: " + this.id +
+			"Identificacao: " + this.id +
 			"\nDescricao: " + this.description +
-			"\nCoordenador: " + coordinator
+			"\nCoordenador: " + this.coordinator
 		);
 	}
 
@@ -173,4 +204,46 @@ public class Project {
 
 		return removedProjectOperation;
 	}
+
+	public String displayEditingMenu(){
+		return (
+			"1) Identificacao" +
+			"2) Descricao" +
+			"3) Inicio" +
+			"4) Fim" +
+			"5) Status" +
+			"6) Coordenador" +
+			"7) Adicionar usuarios no projeto" +
+			"8) Remover usuarios do projeto" +
+			"9) Mudar salario de um usuario" +
+			"10) Sair"
+		);
+	}
+
+	public boolean isReadyToInitiate(){
+		return (!this.start.equals("Sem data") && !this.end.equals("Sem data") && this.status.equals("Em processo de criacao"));
+	}
+
+	public void initiateProject(){
+		if (this.isReadyToInitiate()) this.status = "Iniciado";
+	}
+
+	public void goForward(){
+		if (!this.status.equals("Iniciado")){
+			System.out.println("Nao eh possivel dar inicio ao projeto! (O projeto ja foi iniciado ou nao esta pronto ainda)");
+			return;
+		}
+
+		this.status = "Em andamento";
+	}
+
+	public boolean canBeCompleted(){
+		return this.activities.isEmpty();
+	}
+
+	public void complete(){
+		if (this.canBeCompleted()) this.status = "Concluido";
+		else System.out.println("O projeto nao pode ser concluido");
+	}
+
 }

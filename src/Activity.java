@@ -5,7 +5,7 @@ public class Activity {
     private String description;
     private String start;
     private String end;
-    private ArrayList<User> whoIsDoing;
+    private ArrayList<Student> whoIsDoing;
     private ArrayList<String> duties;
     private User leader;
     private Project ownerProject;
@@ -42,11 +42,11 @@ public class Activity {
         this.end = end;
     }
 
-    public ArrayList<User> getWhoIsDoing() {
+    public ArrayList<Student> getWhoIsDoing() {
         return this.whoIsDoing;
     }
 
-    public void setWhoIsDoing(ArrayList<User> whoIsDoing) {
+    public void setWhoIsDoing(ArrayList<Student> whoIsDoing) {
         this.whoIsDoing = whoIsDoing;
     }
 
@@ -77,7 +77,29 @@ public class Activity {
     @Override
     public String toString(){
         return (
-            this.id + ": " + this.description
+            "Identificacao: " + this.id +
+            "\nDescricao: " + this.description +
+            "\nResponsavel: " + this.leader.getName()
         );
     }
+
+    public String report(){
+        String result = (
+            this.toString() +
+            "\nInicio: " + this.start +
+            "\nFim: " + this.end +
+            "\nAlunos participando:"
+        );
+        for (Student student : this.whoIsDoing) {
+            result.concat("\n\t" + student.toString());
+        }
+        result.concat("\nTarefas:");
+        for (String duty : duties) {
+            result.concat("\n\t" + duty);
+        }
+        result.concat("\nPertence ao projeto: " + this.ownerProject.getId());
+
+        return result;
+    }
+
 }

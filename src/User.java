@@ -52,6 +52,11 @@ public abstract class User implements Menu{
 
     // TODO
     public String displayActivityMenu(){
+        return (
+            "1) Procurar por Atividade" +
+            "2) Listar Atividades" +
+            "3) Relatorio de Atividades"
+        );
     }
 
     // TODO
