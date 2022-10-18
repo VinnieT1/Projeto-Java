@@ -258,7 +258,7 @@ public class Main{
                     projects.add(newProject);
                     ((Coordinator)loggedUser).getProjectsThatUserIsCoordinator().add(newProject);
 
-                    CreateProject createProjectOperation = new CreateProject(newProject);
+                    CreateProjectOperation createProjectOperation = new CreateProjectOperation(newProject);
                     done.push(createProjectOperation);
                     undone.clear();
                 }
@@ -271,13 +271,18 @@ public class Main{
                     projectName = input.nextLine();
 
                     idx = getProjectIndexByName(((Coordinator)loggedUser).getProjectsThatUserIsCoordinator(), projectName);
-                    if (idx != NOT_FOUND){
+                    if (idx == NOT_FOUND){
                         System.out.println("Projeto nao encontrado");
                         continue;
                     }
                     else project = ((Coordinator)loggedUser).getProjectsThatUserIsCoordinator().get(idx);
 
-                    RemoveProject removedProjectOperation = project.remove(projects);
+                    if (project.getActivities().size() != 0){
+                        System.out.println("Nao e possivel remover projetos com atividades! Remova as atividades primeiro");;
+                        continue;
+                    }
+
+                    RemoveProjectOperation removedProjectOperation = new RemoveProjectOperation(project);
                     if (removedProjectOperation != null){
                         done.push(removedProjectOperation);
                         undone.clear();
@@ -433,6 +438,7 @@ public class Main{
                         project.getPeopleOnProject().add((Student)user);
                         project.getSalary().add(userSalary);
                         ((Student)user).getProjectsWorkedOn().add(project);
+                        ((Student)user).getSalaries().add(userSalary);
                     }
                     else if (command == 8){
                         String userName;
@@ -477,7 +483,7 @@ public class Main{
                     }
                     else continue;
                 
-                    Operation editedProjectOperation = new EditProject(project, projectBeforeEditing);
+                    Operation editedProjectOperation = new EditProjectOperation(project, projectBeforeEditing);
                     done.push(editedProjectOperation);
                     undone.clear();
                 }
@@ -520,7 +526,7 @@ public class Main{
                     targetProject.getBorrowedUsers().add(student);
                     student.getProjectsThatUserWasLentTo().add(targetProject);
 
-                    Operation editedProjectOperation = new EditProject(targetProject, targetProjectBeforeEditing);
+                    Operation editedProjectOperation = new EditProjectOperation(targetProject, targetProjectBeforeEditing);
                     done.push(editedProjectOperation);
                     undone.clear();
                 }
@@ -554,23 +560,453 @@ public class Main{
                         System.out.println(activity.report());
                     }
                 }
-                else if (command == 4){
-                    // TODO
+                else if (command == 4 && loggedUser.canBeCoordinator()){
+                    String id, description, start, end, leaderName, projectName;
+                    int projectIdx, userIdx;
+                    Activity newActivity;
+                    Project project;
+                    Student leader = null;
+
+                    System.out.println("Diga o id do projeto da atividade");
+                    projectName = input.nextLine();
+                    projectIdx = getProjectIndexByName(projects, projectName);
+                    if (projectIdx == NOT_FOUND){
+                        System.out.println("Projeto nao encontrado");
+                        continue;
+                    }
+                    project = projects.get(projectIdx);
+
+                    System.out.println("Diga o id, descricao, inicio, fim e nome do responsavel pela atividade");
+                    System.out.println("(Digite 'SAIR' para sair)");
+                    id = input.nextLine();
+    
+                    if (id.equals("SAIR")) continue;
+    
+                    description = input.nextLine();
+                    start = input.nextLine();
+                    end = input.nextLine();
+                    leaderName = input.nextLine();
+    
+                    userIdx = getStudentIndexByName(project.getPeopleOnProject(), leaderName);
+                    if (userIdx != NOT_FOUND){
+                        leader = project.getPeopleOnProject().get(userIdx);
+                    }
+                    else{
+                        userIdx = getStudentIndexByName(project.getBorrowedUsers(), leaderName);
+                        if (userIdx != NOT_FOUND){
+                            leader = project.getBorrowedUsers().get(userIdx);
+                        }
+                    }
+
+                    if (userIdx == NOT_FOUND){
+                        System.out.println("Usuario nao encontrado");
+                        continue;
+                    }
+    
+                    newActivity = new Activity(id, description, start, end, leader, project);
+                    activities.add(newActivity);
+                    leader.getActivitiesThatUserIsLeader().add(newActivity);
+                    project.getActivities().add(newActivity);
+
+                    CreateActivityOperation createActivityOperation = new CreateActivityOperation(newActivity);
+                    done.push(createActivityOperation);
+                    undone.clear();
                 }
-                else if (command == 5){
-                    // TODO
+                else if (command == 5 && loggedUser.canBeCoordinator()){
+                    String projectName, activityName;
+                    Project project;
+                    Activity activity;
+                    int idx;
+
+                    System.out.println("Digite a identificacao do projeto dono da atividade a remover");
+                    projectName = input.nextLine();
+
+                    idx = getProjectIndexByName(((Coordinator)loggedUser).getProjectsThatUserIsCoordinator(), projectName);
+                    if (idx == NOT_FOUND){
+                        System.out.println("Projeto nao encontrado");
+                        continue;
+                    }
+                    else project = ((Coordinator)loggedUser).getProjectsThatUserIsCoordinator().get(idx);
+
+                    System.out.println("Digite a identificacao da atividade a remover");
+                    activityName = input.nextLine();
+
+                    idx = getActivityIndexByName(project.getActivities(), activityName);
+                    if (idx == NOT_FOUND){
+                        System.out.println("Atividade nao encontrada");
+                        continue;
+                    }
+                    else activity = project.getActivities().get(idx);
+
+                    RemoveActivityOperation removedActivityOperation = activity.remove(activities);
+                    if (removedActivityOperation != null){
+                        done.push(removedActivityOperation);
+                        undone.clear();
+                    }
                 }
-                else if (command == 6){
-                    // TODO
+                else if (command == 6 && loggedUser.canBeCoordinator()){
+                    String projectName, activityName;
+                    Project project;
+                    Activity activity, activityBeforeEditing;
+                    int idx;
+
+                    System.out.println("Digite a identificacao do projeto dono da atividade a editar");
+                    projectName = input.nextLine();
+
+                    idx = getProjectIndexByName(((Coordinator)loggedUser).getProjectsThatUserIsCoordinator(), projectName);
+                    if (idx == NOT_FOUND){
+                        System.out.println("Projeto nao encontrado");
+                        continue;
+                    }
+                    else project = ((Coordinator)loggedUser).getProjectsThatUserIsCoordinator().get(idx);
+
+                    System.out.println("Digite a identificacao da atividade a editar");
+                    activityName = input.nextLine();
+
+                    idx = getActivityIndexByName(project.getActivities(), activityName);
+                    if (idx == NOT_FOUND){
+                        System.out.println("Atividade nao encontrada");
+                        continue;
+                    }
+                    else activity = project.getActivities().get(idx);
+
+                    activityBeforeEditing = new Activity();
+                    activityBeforeEditing.copyActivityInfoFrom(activity);
+
+                    System.out.println("1) Identificacao");
+                    System.out.println("2) Descricao");
+                    System.out.println("3) Inicio");
+                    System.out.println("4) Fim");
+                    System.out.println("5) Responsavel");
+                    System.out.println("6) Adicionar usuario a atividade");
+                    System.out.println("7) Remover usuario da atividade");
+                    System.out.println("99) Sair");
+
+                    command = input.nextInt();
+                    input.nextLine();
+
+                    if (command == 1){
+                        String newActivityId;
+
+                        System.out.println("Digite a nova identificacao");
+                        System.out.println("(Digite 'SAIR' para sair)");
+                        newActivityId = input.nextLine();
+
+                        if (newActivityId.equals("SAIR")) continue;
+
+                        activity.setId(newActivityId);
+                    }
+                    else if (command == 2){
+                        String newActivityDescription;
+
+                        System.out.println("Digite a nova descricao");
+                        System.out.println("(Digite 'SAIR' para sair)");
+                        newActivityDescription = input.nextLine();
+
+                        if (newActivityDescription.equals("SAIR")) continue;
+
+                        activity.setDescription(newActivityDescription);
+                    }
+                    else if (command == 3){
+                        String newActivityStart;
+
+                        System.out.println("Digite a nova data de inicio");
+                        System.out.println("(Digite 'SAIR' para sair)");
+                        newActivityStart = input.nextLine();
+
+                        if (newActivityStart.equals("SAIR")) continue;
+
+                        activity.setStart(newActivityStart);
+                    }
+                    else if (command == 4){
+                        String newActivityEnd;
+
+                        System.out.println("Digite a nova data de fim");
+                        newActivityEnd = input.nextLine();
+
+                        if (newActivityEnd.equals("SAIR")) continue;
+
+                        activity.setEnd(newActivityEnd);
+                    }
+                    else if (command == 5){
+                        String newActivityLeaderName;
+                        Student newActivityLeader;
+                        int userIdx;
+
+                        System.out.println("Digite o nome do novo responsavel");
+                        newActivityLeaderName = input.nextLine();
+                        if (newActivityLeaderName.equals("SAIR")) continue;
+                        
+                        userIdx = getStudentIndexByName(activity.getWhoIsDoing(), newActivityLeaderName);
+                        if (userIdx == NOT_FOUND){
+                            System.out.println("Usuario nao encontrado");
+                            continue;
+                        }
+                        newActivityLeader = activity.getWhoIsDoing().get(userIdx);
+                        activity.setLeader(newActivityLeader);
+                    }
+                    else if (command == 6){
+                        String userName, duty;
+                        int userIdx;
+                        Student user;
+                        System.out.println("Que usuario?");
+                        userName = input.nextLine();
+                        userIdx = getStudentIndexByName(activity.getOwnerProject().getPeopleOnProject(), userName);
+                        if (userIdx == NOT_FOUND){
+                            userIdx = getStudentIndexByName(activity.getOwnerProject().getBorrowedUsers(), userName);
+                            if (userIdx == NOT_FOUND){
+                                System.out.println("Usuario nao encontrado no projeto");
+                                continue;
+                            }
+                            else{
+                                user = activity.getOwnerProject().getBorrowedUsers().get(userIdx);
+                            }
+                        }
+                        else user = activity.getOwnerProject().getPeopleOnProject().get(userIdx);
+
+                        System.out.println("Qual dever do usuario?");
+                        duty = input.nextLine();
+                        activity.getDuties().add(duty);
+
+                        user.getActivitiesWorkedOn().add(activity);
+                        activity.getWhoIsDoing().add(user);
+                    }
+                    else if (command == 7){
+                        int userIdx;
+                        String userName;
+                        Student user;
+
+                        System.out.println("Que usuario?");
+
+                        userName = input.nextLine();
+
+                        userIdx = getStudentIndexByName(activity.getWhoIsDoing(), userName);
+                        if (userIdx == NOT_FOUND){
+                            System.out.println("Usuario nao encontrado na atividade");
+                            continue;
+                        }
+                        user = activity.getWhoIsDoing().get(userIdx);
+
+                        user.getActivitiesWorkedOn().remove(activity);
+                        activity.getDuties().remove(userIdx);
+                        activity.getWhoIsDoing().remove(userIdx);
+                    }
+                    else if (command == 99) continue;
+                
+                    EditActivityOperation editActivityOperation = new EditActivityOperation(activity, activityBeforeEditing);
+                    done.push(editActivityOperation);
+                    undone.clear();
                 }
-            
-            
-            
-            
-            
             }
             else if (command == 3){
-                // TODO
+                System.out.println(loggedUser.displayUserMenu());
+                command = input.nextInt();
+                input.nextLine();
+
+                if (command == 1){
+                    String userName;
+                    int userIdx;
+                    User user;
+
+                    System.out.println("Que usuario?");
+                    userName = input.nextLine();
+                    userIdx = getUserIndexByName(users, userName);
+                    
+                    if (userIdx != NOT_FOUND){
+                        user = users.get(userIdx);
+                        System.out.println(user);
+                    }
+                    else System.out.println("Nao existe");
+                }
+                else if (command == 2){
+                    for (User user : users) {
+                        System.out.println(user);
+                    }
+                }
+                else if (command == 3 && loggedUser.canBeCoordinator()){
+                    String name, type;
+                    User newUser;
+
+                    System.out.println("Diga o nome e o tipo do usuario");
+                    System.out.println("(Digite 'SAIR' para sair)");
+                    name = input.nextLine();
+                    if (name.equals("SAIR")) continue;
+                    type = input.nextLine();
+
+                    if (type.equals("professor") || type.equals("coordenador")){
+                        newUser = new Coordinator(name, type);
+                    }
+                    else{
+                        newUser = new Student(name, type);
+                    }
+
+                    users.add(newUser);
+
+                    CreateUserOperation createUserOperation = new CreateUserOperation(newUser);
+                    done.push(createUserOperation);
+                    undone.clear();
+                }
+                else if (command == 4 && loggedUser.canBeCoordinator()){
+                    String userName;
+                    User userToRemove;
+                    int idx;
+    
+                    System.out.println("Que usuario quer remover?");
+                    userName = input.nextLine();
+                    if (userName.equals("SAIR")) continue;
+                    idx = getUserIndexByName(users, userName);
+                    if (idx == NOT_FOUND){
+                        System.out.println("Usuario nao encontrado!");
+                        continue;
+                    }
+                    else userToRemove = users.get(idx);
+
+                    userToRemove.remove(users);
+
+                    RemoveUserOperation removeUserOperation = new RemoveUserOperation(userToRemove);
+                    done.push(removeUserOperation);
+                    undone.clear();
+                }
+                else if (command == 5 && loggedUser.canBeCoordinator()){
+                    String userName;
+                    int userIdx;
+                    User user, userBeforeEditing;
+    
+                    System.out.println("Que usuario?");
+                    userName = input.nextLine();
+                    if (userName.equals("SAIR")) continue;
+                    userIdx = getUserIndexByName(users, userName);
+                    if (userIdx == NOT_FOUND){
+                        System.out.println("Usuario nao encontrado");
+                        continue;
+                    }
+                    user = users.get(userIdx);
+                
+                    if (user.canBeCoordinator()){
+                        userBeforeEditing = new Coordinator();
+                    }
+                    else{
+                        userBeforeEditing = new Student();
+                    }
+                    userBeforeEditing.copyUserInfoFrom(user);
+
+                    System.out.println(((Coordinator)loggedUser).displayUserEditingMenu());
+                    command = input.nextInt();
+                    input.nextLine();
+
+                    if (command == 1){
+                        if (!(user instanceof Student)){
+                            System.out.println("Nao e possivel adicionar usuarios desse tipo a projetos");
+                            continue;
+                        }
+
+                        String projectName;
+                        int projectIdx;
+                        double userSalary;
+                        Project project;
+
+                        System.out.println("Que projeto?");
+
+                        projectName = input.nextLine();
+                        projectIdx = getProjectIndexByName(((Coordinator)loggedUser).getProjectsThatUserIsCoordinator(), projectName);
+                        if (projectIdx == NOT_FOUND){
+                            System.out.println("Projeto nao encontrado");
+                            continue;
+                        }
+                        project = ((Coordinator)loggedUser).getProjectsThatUserIsCoordinator().get(projectIdx);
+
+                        System.out.println("Qual e o salario do usuario?");
+
+                        userSalary = input.nextDouble();
+                        input.nextLine();
+
+                        project.getPeopleOnProject().add((Student)user);
+                        project.getSalary().add(userSalary);
+                        ((Student)user).getProjectsWorkedOn().add(project);
+                        ((Student)user).getSalaries().add(userSalary);
+                    }
+                    else if (command == 2){
+                        if (!(user instanceof Student)){
+                            System.out.println("Nao e possivel adicionar usuarios desse tipo a projetos");
+                            continue;
+                        }
+
+                        String activityName, projectName;
+                        int activityIdx, projectIdx;
+                        Project project;
+                        Activity activity;
+
+                        System.out.println("De que projeto e a atividade?");
+                        projectName = input.nextLine();
+                        projectIdx = getProjectIndexByName(((Coordinator)loggedUser).getProjectsThatUserIsCoordinator(), projectName);
+                        if (projectIdx == NOT_FOUND){
+                            System.out.println("Projeto nao encontrado");
+                            continue;
+                        }
+                        project = ((Coordinator)loggedUser).getProjectsThatUserIsCoordinator().get(projectIdx);
+
+                        System.out.println("Que atividade?");
+                        activityName = input.nextLine();
+                        activityIdx = getActivityIndexByName(project.getActivities(), activityName);
+                        if (activityIdx == NOT_FOUND){
+                            System.out.println("Atividade nao encontrada");
+                            continue;
+                        }
+                        activity = activities.get(activityIdx);
+
+                        ((Student)user).getActivitiesWorkedOn().add(activity);
+                        activity.getWhoIsDoing().add((Student)user);
+                    }
+                    else if (command == 3){
+                        if (user instanceof Coordinator && user != loggedUser){
+                            System.out.println("Nao e possivel editar dados de outros coordenadores");
+                            continue;
+                        }
+                        System.out.println("1) Editar nome");
+                        System.out.println("2) Editar tipo");
+                        System.out.println("99) Sair");
+    
+                        command = input.nextInt();
+                        input.nextLine();
+    
+                        if (command == 1){
+                            String newUserName;
+    
+                            System.out.println("Digite o novo nome");
+                            newUserName = input.nextLine();
+    
+                            if (newUserName.equals("SAIR")) continue;
+    
+                            user.setName(newUserName);
+                        }
+                        else if (command == 2){
+                            String newUserType;
+    
+                            System.out.println("Digite o novo tipo");
+                            newUserType = input.nextLine();
+    
+                            if (newUserType.equals("SAIR")) continue;
+                            
+                            if (
+                                    (user.canBeCoordinator() && !(newUserType.equals("professor") || newUserType.equals("pesquisador")))
+                                    || (!user.canBeCoordinator() && (newUserType.equals("professor") || newUserType.equals("pesquisador")))
+                                ){
+                                System.out.println("Mudanca nao possivel!");
+                                System.err.println("Para mudar de Estudante para Coordenador, remova o usuario antigo e");
+                                System.out.println("crie um novo com o tipo desejado");
+                                continue;
+                            }
+                            user.setType(newUserType);
+                        }
+                        else continue;
+                    }
+                    else continue;
+                    
+                    EditUserOperation editUserOperation = new EditUserOperation(user, userBeforeEditing);
+                    done.push(editUserOperation);
+                    undone.clear();
+                }
+                else continue;
             }
             else if (command == 4){
                 loggedAccount = null;
@@ -580,13 +1016,35 @@ public class Main{
                 break;
             }
             else if (command == 6 && loggedUser.canBeCoordinator()){
-                // TODO
+                if (done.size() == 0){
+                    System.out.println("Nao ha nada para desfazer!");
+                    continue;
+                }
+
+                Operation operation = done.pop();
+                operation.undo(projects, activities, users);
+                undone.push(operation);
             }
             else if (command == 7 && loggedUser.canBeCoordinator()){
-                // TODO
+                if (undone.size() == 0){
+                    System.out.println("Nao ha nada para fazer!");
+                    continue;
+                }
+
+                Operation operation = undone.pop();
+                operation.redo(projects, activities, users);
+                done.push(operation);
             }
             else if (command == 8 && loggedUser.canBeCoordinator()){
-                // TODO
+                int period;
+                System.out.println("Ha quantos dias ocorreu o ultimo pagamento das bolsas?");
+
+                period = input.nextInt();
+                input.nextLine();
+
+                for (Project project : ((Coordinator)loggedUser).getProjectsThatUserIsCoordinator()) {
+                    if (period >= project.getPaymentPeriod()) project.makePayments();
+                }
             }
             else{
                 System.out.println("Opcao invalida!");

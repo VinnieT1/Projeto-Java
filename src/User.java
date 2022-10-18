@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public abstract class User implements Menu{
     private String name;
     private String type;
@@ -6,6 +8,10 @@ public abstract class User implements Menu{
     public User(String name, String type){
         this.name = name;
         this.type = type;
+    }
+
+    public User(){
+
     }
 
     public String getName() {
@@ -50,18 +56,19 @@ public abstract class User implements Menu{
         );
     }
 
-    // TODO
     public String displayActivityMenu(){
         return (
             "1) Procurar por Atividade" +
-            "2) Listar Atividades" +
-            "3) Relatorio de Atividades"
+            "\n2) Listar Atividades" +
+            "\n3) Relatorio de Atividades"
         );
     }
 
-    // TODO
     public String displayUserMenu(){
-        
+        return (
+            "1) Procurar por Usuario" +
+            "\n2) Listar Usuarios"
+        );
     }
 
     public boolean canBeCoordinator(){
@@ -74,5 +81,9 @@ public abstract class User implements Menu{
             this.name + ", " + this.type
         );
     }
+
+    public abstract void remove(ArrayList<User> users);
+    public abstract void copyUserInfoFrom(User user);
+    public abstract void undoRemove(ArrayList<User> users);
 
 }

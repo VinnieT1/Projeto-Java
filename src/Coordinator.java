@@ -8,6 +8,10 @@ public class Coordinator extends User{
         this.projectsThatUserIsCoordinator = new ArrayList<Project>();
     }
 
+    public Coordinator(){
+        super();
+    }
+
     public ArrayList<Project> getProjectsThatUserIsCoordinator() {
         return this.projectsThatUserIsCoordinator;
     }
@@ -30,10 +34,10 @@ public class Coordinator extends User{
     public String displayProjectMenu(){
         return (
             super.displayProjectMenu() +
-            "4) Criar Projeto" +
-            "5) Remover Projeto" +
-            "6) Editar Projeto" +
-            "7) Enviar usuario por intercambio"
+            "\n4) Criar Projeto" +
+            "\n5) Remover Projeto" +
+            "\n6) Editar Projeto" +
+            "\n7) Enviar usuario por intercambio"
         );
     }
 
@@ -41,9 +45,9 @@ public class Coordinator extends User{
     public String displayActivityMenu(){
         return (
             super.displayActivityMenu() +
-            "4) Criar Atividade" +
-            "5) Remover Atividade" +
-            "6) Editar Atividade"
+            "\n4) Criar Atividade" +
+            "\n5) Remover Atividade" +
+            "\n6) Editar Atividade"
         );
     }
 
@@ -51,10 +55,45 @@ public class Coordinator extends User{
     public String displayUserMenu(){
         return (
             super.displayUserMenu() +
-            "4) Criar Usuario" +
-            "5) Remover Usuario" +
-            "6) Editar Usuario"
+            "\n4) Criar Usuario" +
+            "\n5) Remover Usuario" +
+            "\n6) Editar Usuario"
         );
     }
 
+    public String displayUserEditingMenu(){
+        return (
+            "1) Adicionar usuario a um projeto" +
+            "\n2) Adicionar usuario a uma atividade" +
+            "\n3) Editar informacoes do usuario" +
+            "\n4) Sair"
+        );
+    }
+
+    @Override
+    public void remove(ArrayList<User> users) {
+        for (Project project : this.projectsThatUserIsCoordinator) {
+            project.setCoordinator(null);
+        }
+        users.remove(this);
+    }   
+
+    @Override
+    public void undoRemove(ArrayList<User> users) {
+        for (Project project : this.projectsThatUserIsCoordinator) {
+            project.setCoordinator(this);
+        }
+        users.add(this);
+    }
+
+    public void copyUserInfoFrom(User coordinator){
+        super.setName(coordinator.getName());
+        super.setType(coordinator.getType());
+        super.setAccount(coordinator.getAccount());
+
+        this.projectsThatUserIsCoordinator.clear();
+        for (Project project : ((Coordinator)coordinator).projectsThatUserIsCoordinator) {
+            this.projectsThatUserIsCoordinator.add(project);
+        }
+    }
 }

@@ -162,61 +162,40 @@ public class Project {
 			"\nFim: " + this.end +
 			"\nStatus: " + this.status
 		);
-		result.concat("Atividades do projeto:");
+		result = result.concat("\nAtividades do projeto:");
 		for (Activity activity : this.activities) {
-			result.concat(
+			result = result.concat(
 				"\n\t" + activity.toString()
 			);
 		}
-		result.concat("\nParticipantes do projeto:");
+		result = result.concat("\nParticipantes do projeto:");
 		for (User user : this.peopleOnProject) {
-			result.concat(
+			result = result.concat(
 				"\n\t" + user.toString()
 			);
 		}
-		result.concat("\nParticipantes em intercambio:");
+		result = result.concat("\nParticipantes em intercambio:");
 		for (User user : this.borrowedUsers) {
-			result.concat(
+			result = result.concat(
 				"\n\t" + user.toString()
 			);
 		}
 		
-
 		return result;
-	}
-
-	public RemoveProject remove(ArrayList<Project> projects){
-		if (this.activities.size() != 0){
-			System.out.println("Nao e possivel remover projetos com atividades! Remova as atividades primeiro");
-			return null;
-		}
-
-		RemoveProject removedProjectOperation = new RemoveProject(this);
-		
-		projects.remove(this);
-		this.getCoordinator().getProjectsThatUserIsCoordinator().remove(this);
-		for (Student student : this.getPeopleOnProject()) {
-			student.getProjectsWorkedOn().remove(this);
-		}
-		for (Student student : this.getBorrowedUsers()) {
-			student.getProjectsThatUserWasLentTo().remove(this);
-		}
-
-		return removedProjectOperation;
 	}
 
 	public String displayEditingMenu(){
 		return (
 			"1) Identificacao" +
-			"2) Descricao" +
-			"3) Inicio" +
-			"4) Fim" +
-			"5) Status" +
-			"6) Coordenador" +
-			"7) Adicionar usuarios no projeto" +
-			"8) Remover usuarios do projeto" +
-			"9) Mudar salario de um usuario" +
-			"10) Sair"
+			"\n2) Descricao" +
+			"\n3) Inicio" +
+			"\n4) Fim" +
+			"\n5) Status" +
+			"\n6) Coordenador" +
+			"\n7) Adicionar usuarios no projeto" +
+			"\n8) Remover usuarios do projeto" +
+			"\n9) Mudar salario de um usuario" +
+			"\n10) Sair"
 		);
 	}
 
@@ -244,6 +223,38 @@ public class Project {
 	public void complete(){
 		if (this.canBeCompleted()) this.status = "Concluido";
 		else System.out.println("O projeto nao pode ser concluido");
+	}
+
+	public void remove(ArrayList<Project> projects){
+		for (Student student : this.peopleOnProject) {
+            int idx = student.getProjectsWorkedOn().indexOf(this);
+            student.getProjectsWorkedOn().remove(idx);
+            student.getSalaries().remove(idx);
+        }
+        for (Student student : this.borrowedUsers) {
+            student.getProjectsThatUserWasLentTo().remove(this);
+        }
+
+		projects.remove(this);
+	}
+
+	public void undoRemove(ArrayList<Project> projects){
+		for (Student student : this.peopleOnProject) {
+			int idx = this.peopleOnProject.indexOf(student);
+			student.getProjectsWorkedOn().add(this);
+			student.getSalaries().add(this.salary.get(idx));
+		}
+		for (Student student : this.borrowedUsers) {
+			student.getProjectsThatUserWasLentTo().add(this);
+		}
+		
+		projects.add(this);
+	}
+
+	public void makePayments(){
+		for (int i = 0; i < this.peopleOnProject.size(); i++) {
+			System.out.println("Pagando R$" + this.salary.get(i) + " para " + this.peopleOnProject.get(i));
+		}
 	}
 
 }

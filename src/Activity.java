@@ -7,11 +7,45 @@ public class Activity {
     private String end;
     private ArrayList<Student> whoIsDoing;
     private ArrayList<String> duties;
-    private User leader;
+    private Student leader;
     private Project ownerProject;
+
+    public Activity(String id, String description, String start, String end, Student leader, Project project){
+        this.id = id;
+        this.description = description;
+        this.start = start;
+        this.end = end;
+        this.leader = leader;
+        this.ownerProject = project;
+    }
+
+    public Activity(){
+        this.whoIsDoing = new ArrayList<Student>();
+        this.duties = new ArrayList<String>();
+    }
 
     public String getId() {
         return this.id;
+    }
+
+    public void copyActivityInfoFrom(Activity activity){
+        this.id = activity.id;
+        this.description = activity.description;
+        this.start = activity.start;
+        this.end = activity.end;
+
+        this.whoIsDoing.clear();
+        for (Student student : activity.whoIsDoing) {
+            this.whoIsDoing.add(student);
+        }
+        
+        this.duties.clear();
+        for (String duty : activity.duties) {
+            this.duties.add(duty);
+        }
+        
+        this.leader = activity.leader;
+        this.ownerProject = activity.ownerProject;
     }
 
     public void setId(String id) {
@@ -58,11 +92,11 @@ public class Activity {
         this.duties = duties;
     }
 
-    public User getLeader() {
+    public Student getLeader() {
         return this.leader;
     }
 
-    public void setLeader(User leader) {
+    public void setLeader(Student leader) {
         this.leader = leader;
     }
 
@@ -100,6 +134,17 @@ public class Activity {
         result.concat("\nPertence ao projeto: " + this.ownerProject.getId());
 
         return result;
+    }
+
+    public RemoveActivityOperation remove(ArrayList<Activity> activities){
+        for (Student student : this.whoIsDoing) {
+            student.getActivitiesWorkedOn().remove(this);
+        }
+        this.leader.getActivitiesThatUserIsLeader().remove(this);
+        this.ownerProject.getActivities().remove(this);
+
+        RemoveActivityOperation removedActivityOperation = new RemoveActivityOperation(this);
+        return removedActivityOperation;
     }
 
 }
