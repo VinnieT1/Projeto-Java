@@ -51,6 +51,19 @@ public class Coordinator extends User{
         );
     }
 
+    public String displayActivityEditingMenu(){
+        return (
+            "1) Identificacao" +
+            "\n2) Descricao" +
+            "\n3) Inicio" +
+            "\n4) Fim" +
+            "\n5) Responsavel" +
+            "\n6) Adicionar usuario a atividade" +
+            "\n7) Remover usuario da atividade" +
+            "\n99) Sair"
+        );
+    }
+
     @Override
     public String displayUserMenu(){
         return (
