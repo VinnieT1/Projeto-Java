@@ -10,7 +10,9 @@ public abstract class User implements Menu{
         this.type = type;
     }
 
-    public User(){}
+    public User(){
+	
+	}
 
     public String getName() {
 		return this.name;
