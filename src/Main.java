@@ -93,7 +93,7 @@ public class Main{
                         idx = getAccountIndexByName(accounts, username);
                         accountLogIn = accounts.get(idx);
                     }
-                        catch (Exception e){
+                    catch (Exception e){
                         System.out.println("Usuario nao encontrado!");
                         continue;
                     }
@@ -183,8 +183,8 @@ public class Main{
                             input.nextLine();
                         }
                         catch (Exception e){
-                            input.nextInt();
                             System.out.println("Invalido");
+                            input.nextLine();
                             break;
                         }      
 
@@ -248,7 +248,6 @@ public class Main{
                 }
                 else System.out.println("Opcao invalida");
             }
-            // if (loggedAccount == null) continue;
 
             System.out.println(loggedUser.displayMainMenu());
 
@@ -534,9 +533,9 @@ public class Main{
                         System.out.println("Que usuario?");
 
                         userName = input.nextLine();
-                        userIdx = getUserIndexByName(users, userName);
-
+                        
                         try{
+                            userIdx = getUserIndexByName(users, userName);
                             user = users.get(userIdx);
                         }
                         catch (Exception e){
@@ -587,18 +586,6 @@ public class Main{
                                 continue;
                             }
                         }
-                        // userName = input.nextLine();
-                        // userIdx = getStudentIndexByName(project.getPeopleOnProject(), userName);
-                        // if (userIdx == NOT_FOUND){
-                        //     userIdx = getStudentIndexByName(project.getBorrowedUsers(), userName);
-                        //     if (userIdx == NOT_FOUND){
-                        //         System.out.println("Usuario nao encontrado");
-                        //         continue;
-                        //     }
-                        //     user = project.getBorrowedUsers().get(userIdx);
-                        //     project.getBorrowedUsers().remove(user);
-                        // }
-                        // else user = project.getPeopleOnProject().get(userIdx);
 
                         project.getPeopleOnProject().remove(user);
                         project.getSalary().remove(userIdx);
@@ -695,8 +682,16 @@ public class Main{
             }
             else if (command == 2){
                 System.out.println(loggedUser.displayActivityMenu());
-                command = input.nextInt();
-                input.nextLine();
+
+                try{
+                    command = input.nextInt();
+                    input.nextLine();
+                }
+                catch(Exception e){
+                    System.out.println("Invalido");
+                    input.nextLine();
+                    continue;
+                }
 
                 if (command == 1){
                     String activityName;
@@ -959,13 +954,14 @@ public class Main{
                         System.out.println("Que usuario?");
 
                         userName = input.nextLine();
-
-                        userIdx = getStudentIndexByName(activity.getWhoIsDoing(), userName);
-                        if (userIdx == NOT_FOUND){
+                        try{
+                            userIdx = getStudentIndexByName(activity.getWhoIsDoing(), userName);
+                            user = activity.getWhoIsDoing().get(userIdx);
+                        }
+                        catch (Exception e){
                             System.out.println("Usuario nao encontrado na atividade");
                             continue;
                         }
-                        user = activity.getWhoIsDoing().get(userIdx);
 
                         user.getActivitiesWorkedOn().remove(activity);
                         activity.getDuties().remove(userIdx);
@@ -980,8 +976,16 @@ public class Main{
             }
             else if (command == 3){
                 System.out.println(loggedUser.displayUserMenu());
-                command = input.nextInt();
-                input.nextLine();
+
+                try{
+                    command = input.nextInt();
+                    input.nextLine();
+                }
+                catch(Exception e){
+                    System.out.println("Invalido");
+                    input.nextLine();
+                    continue;
+                }
 
                 if (command == 1){
                     String userName;
@@ -990,13 +994,16 @@ public class Main{
 
                     System.out.println("Que usuario?");
                     userName = input.nextLine();
-                    userIdx = getUserIndexByName(users, userName);
-                    
-                    if (userIdx != NOT_FOUND){
+
+                    try{
+                        userIdx = getUserIndexByName(users, userName);
                         user = users.get(userIdx);
                         System.out.println(user);
                     }
-                    else System.out.println("Nao existe");
+                    catch (Exception e){
+                        System.out.println("Nao existe");
+                        continue;
+                    }
                 }
                 else if (command == 2){
                     for (User user : users) {
@@ -1202,7 +1209,7 @@ public class Main{
                             if (
                                     (user.canBeCoordinator() && !(newUserType.equals("professor") || newUserType.equals("pesquisador")))
                                     || (!user.canBeCoordinator() && (newUserType.equals("professor") || newUserType.equals("pesquisador")))
-                                ){
+                            ){
                                 System.out.println("Mudanca nao possivel!");
                                 System.out.println("Para mudar de Estudante para Coordenador, remova o usuario antigo e");
                                 System.out.println("crie um novo com o tipo desejado");
