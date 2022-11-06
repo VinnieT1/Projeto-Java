@@ -11,6 +11,7 @@ public class Activity {
     private Project ownerProject;
 
     public Activity(String id, String description, String start, String end, Student leader, Project project){
+        this();
         this.id = id;
         this.description = description;
         this.start = start;
