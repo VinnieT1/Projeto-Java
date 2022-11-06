@@ -5,7 +5,7 @@ Projeto Java da matéria de Projeto de Software, matéria do curso de Engenharia
 
 ## Informações:
 **Aluno**:
-* Vinícius Teixeira
+* Vinícius Teixeira Pereira Ramos
 
 **Professor**:
 * Baldoino Fonseca dos Santos Neto
