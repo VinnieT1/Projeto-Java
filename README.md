@@ -10,48 +10,61 @@ Projeto Java da matéria de Projeto de Software, matéria do curso de Engenharia
 **Professor**:
 * Baldoino Fonseca dos Santos Neto
 
-## Code Smells:
-Identificação de Code Smells no código do projeto.
+## Patterns:
+Implementação dos Code Patterns a fim de resolver Code Smells.
 
-### Primitive Obsession:
+### Introduce Parameter Object:
 
-#### Utilização da variável 'private String type' para controlar o retorno do método 'public boolean canBeCoordinator()':
-#### Ocorre na classe User.
+#### Antes, era necessário passar sempre 3 objetos que representavam o estado do projeto. Logo, foi possível implementar o padrão Introduce Parameter Object, de modo a agrupar esses 3 objetos em um só Objeto da classe StorageState:
 ```java
-public abstract class User implements Menu{
-	private String name;
-	private String type;
-	private Account account;
-	
-	public boolean canBeCoordinator(){
-		return (this.type.equals("professor") || this.type.equals("coordenador"));
-	}
+public class StorageState {
+    private ArrayList<Project> projects;
+    private ArrayList<Activity> activities;
+    private ArrayList<User> users;
+
+    public StorageState(ArrayList<Project> projects, ArrayList<Activity> activities, ArrayList<User> users){
+        this.projects = projects;
+        this.activities = activities;
+        this.users = users;
+    }
+
+    public ArrayList<Project> getProjects(){
+        return this.projects;
+    }
+
+    public ArrayList<Activity> getActivities(){
+        return this.activities;
+    }
+
+    public ArrayList<User> getUsers(){
+        return this.users;
+    }
 }
 ```
-* [LINK](https://github.com/VinnieT1/Projeto-Java/blob/Exceptions/src/User.java)
+* [LINK]() SEM LINK AINDA!!!
 
 ---
 
-### Speculative Generality:
+### Chain Constructor:
 
-#### Métodos requerem 3 parâmetros, porém, nem todos são usados:
-#### Ocorre na interface UndoRedo e em todas as sub-classes de Operation, pois Operation implementa UndoRedo.
+#### Na classe Account, foi utilizado o padrão Chain Constructor para evitar duplicação de código.
 ```java
-public interface UndoRedo {
-	public void undo(ArrayList<Project> projects, ArrayList<Activity> activities, ArrayList<User> users);
-	public void redo(ArrayList<Project> projects, ArrayList<Activity> activities, ArrayList<User> users);
+public class Account {
+    private String username;
+    private String password;
+    private User accountOwner;
+
+    public Account(String username, String password){
+        this.username = username;
+        this.password = password;
+    }
+
+    public Account(String username, String password, User accountOwner){
+        this(username, password);
+        this.accountOwner = accountOwner;
+    }
 }
 ```
-* [LINK](https://github.com/VinnieT1/Projeto-Java/blob/Exceptions/src/UndoRedo.java)
+* [LINK]() SEM LINK AINDA!!!
 
 ---
-
-### Middle Man:
-
-#### (?) A classe Operation só serve para ser uma superclasse das subclasses da mesma, porém não possui atributos nem métodos. Foi necessário para conseguir armazenar todos os objetos das subclasses em um só ArrayList (done e undone, na classe Main)
-```java
-public abstract class Operation implements UndoRedo{
-    
-}
-```
-* [LINK](https://github.com/VinnieT1/Projeto-Java/blob/Exceptions/src/Operation.java)
