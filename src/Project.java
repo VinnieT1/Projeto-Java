@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Date;
 
 public class Project {
     private String id;
@@ -12,6 +13,7 @@ public class Project {
 	private ArrayList<Double> salary;
 	private ArrayList<Student> borrowedUsers;
 	private int paymentPeriod;
+	private Date lastPaymentRecieved;
 
 	public Project(String id, String description, Coordinator coordinator, int paymentPeriod){
 		this.id = id;
@@ -25,6 +27,7 @@ public class Project {
         this.salary = new ArrayList<Double>();
         this.borrowedUsers = new ArrayList<Student>();
         this.paymentPeriod = paymentPeriod;
+		this.lastPaymentRecieved = new Date();
 	}
 
 	public Project(){
@@ -39,6 +42,7 @@ public class Project {
         this.status = project.status;
         this.coordinator = project.coordinator;
         this.paymentPeriod = project.paymentPeriod;
+		this.lastPaymentRecieved = project.lastPaymentRecieved;
 
         this.activities.clear();
         for (Activity activity : project.activities) {
@@ -146,6 +150,14 @@ public class Project {
 		this.paymentPeriod = paymentPeriod;
 	}
 
+	public Date getLastPaymentRecieved() {
+		return this.lastPaymentRecieved;
+	}
+
+	public void setLastPaymentRecieved(Date lastPaymentRecieved) {
+		this.lastPaymentRecieved = lastPaymentRecieved;
+	}
+
 	@Override
 	public String toString(){
 		return (	
@@ -251,7 +263,15 @@ public class Project {
 		projects.add(this);
 	}
 
-	public void makePayments(){
+	public void makePayments(Date now){
+		long nowInMiliseconds = now.getTime();
+		long lastPaymentRecievedInMiliseconds = this.lastPaymentRecieved.getTime();
+		int daysSinceLastPayment = (int)(nowInMiliseconds/(1000*60*60*24) - lastPaymentRecievedInMiliseconds/(1000*60*60*24));
+
+		if (daysSinceLastPayment >= this.getPaymentPeriod()){
+			this.setLastPaymentRecieved(now);
+		}
+
 		for (int i = 0; i < this.peopleOnProject.size(); i++) {
 			System.out.println("Pagando R$" + this.salary.get(i) + " para " + this.peopleOnProject.get(i));
 		}

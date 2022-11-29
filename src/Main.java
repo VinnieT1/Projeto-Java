@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Stack;
+import java.util.Date;
 
 public class Main{
 	public static final int NOT_FOUND = -1;
@@ -51,6 +52,7 @@ public class Main{
 		ArrayList<Activity> activities = new ArrayList<Activity>();
 		ArrayList<User> users = new ArrayList<User>();
         ArrayList<Account> accounts = new ArrayList<Account>();
+        StorageState state = new StorageState(projects, activities, users);
 		Account loggedAccount = null;
         User loggedUser = null;
         int command = -1;
@@ -946,7 +948,6 @@ public class Main{
                         activity.getWhoIsDoing().add(user);
                     }
                     else if (command == 7){
-                        // TODO EXCEPTIONS FROM HERE
                         int userIdx;
                         String userName;
                         Student user;
@@ -1237,7 +1238,7 @@ public class Main{
             else if (command == 6 && loggedUser.canBeCoordinator()){
                 try{
                     Operation operation = done.pop();
-                    operation.undo(projects, activities, users);
+                    operation.undo(state);
                     undone.push(operation);
                 }
                 catch (Exception e){
@@ -1248,7 +1249,7 @@ public class Main{
             else if (command == 7 && loggedUser.canBeCoordinator()){
                 try{
                     Operation operation = undone.pop();
-                    operation.redo(projects, activities, users);
+                    operation.redo(state);
                     done.push(operation);
                 }
                 catch (Exception e){
@@ -1257,21 +1258,10 @@ public class Main{
                 }
             }
             else if (command == 8 && loggedUser.canBeCoordinator()){
-                int period;
-                System.out.println("Ha quantos dias ocorreu o ultimo pagamento das bolsas?");
-
-                try{
-                    period = input.nextInt();
-                    input.nextLine();
-                }
-                catch (Exception e){
-                    System.out.println("Invalido");
-                    input.nextLine();
-                    continue;
-                } 
-
+                Date now = new Date();
+                
                 for (Project project : ((Coordinator)loggedUser).getProjectsThatUserIsCoordinator()) {
-                    if (period >= project.getPaymentPeriod()) project.makePayments();
+                    project.makePayments(now);
                 }
             }
             else{

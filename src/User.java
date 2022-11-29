@@ -72,7 +72,7 @@ public abstract class User implements Menu{
     }
 
     public boolean canBeCoordinator(){
-        return (this.type.equals("professor") || this.type.equals("coordenador"));
+        return (this instanceof Coordinator);
     }
 
     @Override

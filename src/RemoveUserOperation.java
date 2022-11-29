@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 public class RemoveUserOperation extends Operation{
     private User removedUser;
 
@@ -8,12 +6,12 @@ public class RemoveUserOperation extends Operation{
     } 
 
     @Override
-    public void undo(ArrayList<Project> projects, ArrayList<Activity> activities, ArrayList<User> users) {
-        this.removedUser.undoRemove(users);
+    public void undo(StorageState state) {
+        this.removedUser.undoRemove(state.getUsers());
     }
 
     @Override
-    public void redo(ArrayList<Project> projects, ArrayList<Activity> activities, ArrayList<User> users) {
-        this.removedUser.remove(users);
+    public void redo(StorageState state) {
+        this.removedUser.remove(state.getUsers());
     }
 }

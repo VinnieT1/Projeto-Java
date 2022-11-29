@@ -33,8 +33,7 @@ public class Account {
     }
 
     public Account(String username, String password, User accountOwner){
-        this.username = username;
-        this.password = password;
+        this(username, password);
         this.accountOwner = accountOwner;
     }
 }

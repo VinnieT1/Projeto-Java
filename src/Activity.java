@@ -10,6 +10,11 @@ public class Activity {
     private Student leader;
     private Project ownerProject;
 
+    public Activity(){
+        this.whoIsDoing = new ArrayList<Student>();
+        this.duties = new ArrayList<String>();
+    }
+
     public Activity(String id, String description, String start, String end, Student leader, Project project){
         this();
         this.id = id;
@@ -18,11 +23,6 @@ public class Activity {
         this.end = end;
         this.leader = leader;
         this.ownerProject = project;
-    }
-
-    public Activity(){
-        this.whoIsDoing = new ArrayList<Student>();
-        this.duties = new ArrayList<String>();
     }
 
     public String getId() {

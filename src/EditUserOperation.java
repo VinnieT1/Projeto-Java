@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 public class EditUserOperation extends Operation{
     private User editedUser;
     private User userBeforeEditing;
@@ -10,7 +8,7 @@ public class EditUserOperation extends Operation{
     }
 
     @Override
-    public void undo(ArrayList<Project> projects, ArrayList<Activity> activities, ArrayList<User> users) {
+    public void undo(StorageState state) {
         if (this.editedUser instanceof Student){
             Student editedUserAux = new Student();
             editedUserAux.copyUserInfoFrom(this.editedUser);
@@ -46,7 +44,7 @@ public class EditUserOperation extends Operation{
     }
 
     @Override
-    public void redo(ArrayList<Project> projects, ArrayList<Activity> activities, ArrayList<User> users) {
+    public void redo(StorageState state) {
         if (this.userBeforeEditing instanceof Student){
             Student userBeforeEditingAux = new Student();
             userBeforeEditingAux.copyUserInfoFrom(this.userBeforeEditing);

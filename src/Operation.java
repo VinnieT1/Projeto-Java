@@ -1,3 +1,1 @@
-public abstract class Operation implements UndoRedo{
-    
-}
+public abstract class Operation implements UndoRedo {}

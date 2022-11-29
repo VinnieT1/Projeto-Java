@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 public class RemoveActivityOperation extends Operation{
     private Activity removedActivity;
 
@@ -8,25 +6,28 @@ public class RemoveActivityOperation extends Operation{
     }
 
     @Override
-    public void undo(ArrayList<Project> projects, ArrayList<Activity> activities, ArrayList<User> users) {
-        activities.add(this.removedActivity);
+    public void undo(StorageState state) {
+        state.getActivities().add(this.removedActivity);
         this.removedActivity.getLeader().getActivitiesThatUserIsLeader().add(this.removedActivity);
         this.removedActivity.getOwnerProject().getActivities().add(this.removedActivity);
+
         for (Student student : this.removedActivity.getWhoIsDoing()) {
             student.getActivitiesWorkedOn().add(this.removedActivity);
         }
+
         this.removedActivity.getLeader().getActivitiesThatUserIsLeader().add(this.removedActivity);
     }
 
     @Override
-    public void redo(ArrayList<Project> projects, ArrayList<Activity> activities, ArrayList<User> users) {
-        activities.remove(this.removedActivity);
+    public void redo(StorageState state) {
+        state.getActivities().remove(this.removedActivity);
         this.removedActivity.getLeader().getActivitiesThatUserIsLeader().remove(this.removedActivity);
         this.removedActivity.getOwnerProject().getActivities().remove(this.removedActivity);
+
         for (Student student : this.removedActivity.getWhoIsDoing()) {
             student.getActivitiesWorkedOn().remove(removedActivity);
         }
+
         this.removedActivity.getLeader().getActivitiesThatUserIsLeader().remove(this.removedActivity);
     }
-    
 }

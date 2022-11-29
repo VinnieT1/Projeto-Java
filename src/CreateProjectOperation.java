@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 public class CreateProjectOperation extends Operation{
     private Project createdProject;
 
@@ -7,13 +5,13 @@ public class CreateProjectOperation extends Operation{
         this.createdProject = createdProject;
     }
 
-    public void undo(ArrayList<Project> projects, ArrayList<Activity> activities, ArrayList<User> users){
+    public void undo(StorageState state){
         createdProject.getCoordinator().getProjectsThatUserIsCoordinator().remove(this.createdProject);
-        projects.remove(this.createdProject);
+        state.getProjects().remove(this.createdProject);
     }
 
-    public void redo(ArrayList<Project> projects, ArrayList<Activity> activities, ArrayList<User> users){
+    public void redo(StorageState state){
         createdProject.getCoordinator().getProjectsThatUserIsCoordinator().add(this.createdProject);
-        projects.add(this.createdProject);
+        state.getProjects().add(this.createdProject);
     }
 }
