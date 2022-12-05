@@ -11,7 +11,7 @@ Projeto Java da matéria de Projeto de Software, matéria do curso de Engenharia
 * Baldoino Fonseca dos Santos Neto
 
 ## Patterns:
-Implementação dos Code Patterns a fim de resolver Code Smells.
+Implementação dos Code Patterns a fim de resolver Code Smells. É possível verificar as diferenças dessa branch com a "Exceptions".
 
 ### Introduce Parameter Object:
 
@@ -41,7 +41,7 @@ public class StorageState {
     }
 }
 ```
-* [LINK]() SEM LINK AINDA!!!
+* [LINK](https://github.com/VinnieT1/Projeto-Java/blob/Patterns/src/StorageState.java)
 
 ---
 
@@ -65,6 +65,6 @@ public class Account {
     }
 }
 ```
-* [LINK]() SEM LINK AINDA!!!
+* [LINK](https://github.com/VinnieT1/Projeto-Java/blob/Patterns/src/Account.java)
 
 ---
