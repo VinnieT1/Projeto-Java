@@ -46,12 +46,25 @@ public interface UndoRedo {
 
 ---
 
-### Middle Man:
+### Duplicated Code:
 
-#### (?) A classe Operation só serve para ser uma superclasse das subclasses da mesma, porém não possui atributos nem métodos. Foi necessário para conseguir armazenar todos os objetos das subclasses em um só ArrayList (done e undone, na classe Main)
+#### Na classe Account, há duplicação de código no método construtor:
 ```java
-public abstract class Operation implements UndoRedo{
-    
+public class Account {
+    private String username;
+    private String password;
+    private User accountOwner;
+
+    public Account(String username, String password){
+        this.username = username;
+        this.password = password;
+    }
+
+    public Account(String username, String password, User accountOwner){
+        this.username = username;
+        this.password = password;
+        this.accountOwner = accountOwner;
+    }
 }
 ```
-* [LINK](https://github.com/VinnieT1/Projeto-Java/blob/Exceptions/src/Operation.java)
+* [LINK](https://github.com/VinnieT1/Projeto-Java/blob/Exceptions/src/Account.java)
