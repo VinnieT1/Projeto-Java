@@ -94,3 +94,108 @@ public class Project {
 }
 ```
 * [LINK](https://github.com/VinnieT1/Projeto-Java/blob/Patterns/src/Project.java)
+
+---
+
+### Bridge:
+
+#### Foram criadas 9 subclasses da classe abstrata Operation, de modo a especificar cada tipo de Operation que pode ser realizada e aplicar o Undo/Redo por polimorfismo.
+
+```java
+public abstract class Operation implements UndoRedo {}
+```
+
+---
+
+```java
+public class CreateProjectOperation extends Operation{
+    private Project createdProject;
+
+    public CreateProjectOperation(Project createdProject){
+        this.createdProject = createdProject;
+    }
+
+    public void undo(StorageState state){
+        createdProject.getCoordinator().getProjectsThatUserIsCoordinator().remove(this.createdProject);
+        state.getProjects().remove(this.createdProject);
+    }
+
+    public void redo(StorageState state){
+        createdProject.getCoordinator().getProjectsThatUserIsCoordinator().add(this.createdProject);
+        state.getProjects().add(this.createdProject);
+    }
+}
+```
+
+---
+
+```java
+public class EditActivityOperation extends Operation{
+    private Activity editedActivity;
+    private Activity activityBeforeEditing;
+
+    public EditActivityOperation(Activity editedActivity, Activity activityBeforeEditing){
+        this.editedActivity = editedActivity;
+        this.activityBeforeEditing = activityBeforeEditing;
+    }
+
+    @Override
+    public void undo(StorageState state) {
+        Activity editedActivityAux = new Activity();
+        editedActivityAux.copyActivityInfoFrom(this.editedActivity);
+
+        for (Student student : this.editedActivity.getWhoIsDoing()) {
+            student.getActivitiesWorkedOn().remove(this.editedActivity);
+        }
+        this.editedActivity.copyActivityInfoFrom(this.activityBeforeEditing);
+        for (Student student : this.editedActivity.getWhoIsDoing()) {
+            student.getActivitiesWorkedOn().add(this.editedActivity);
+        }
+        
+        this.activityBeforeEditing = this.editedActivity;
+        this.editedActivity = editedActivityAux;
+    }
+
+    @Override
+    public void redo(StorageState state) {
+        Activity activityBeforeEditingAux = new Activity();
+        activityBeforeEditingAux.copyActivityInfoFrom(this.activityBeforeEditing);
+
+        for (Student student : this.activityBeforeEditing.getWhoIsDoing()) {
+            student.getActivitiesWorkedOn().remove(this.activityBeforeEditing);
+        }
+        this.activityBeforeEditing.copyActivityInfoFrom(this.editedActivity);
+        for (Student student : this.activityBeforeEditing.getWhoIsDoing()) {
+            student.getActivitiesWorkedOn().add(this.activityBeforeEditing);
+        }
+
+        this.editedActivity = this.activityBeforeEditing;
+        this.activityBeforeEditing = activityBeforeEditingAux;
+    }
+    
+}
+```
+
+---
+
+```java
+public class RemoveUserOperation extends Operation{
+    private User removedUser;
+
+    public RemoveUserOperation(User removedUser){
+        this.removedUser = removedUser;
+    } 
+
+    @Override
+    public void undo(StorageState state) {
+        this.removedUser.undoRemove(state.getUsers());
+    }
+
+    @Override
+    public void redo(StorageState state) {
+        this.removedUser.remove(state.getUsers());
+    }
+}
+```
+
+---
